@@ -1,7 +1,8 @@
 <?php 
     include "_connexionBD.php";
 
-    #Verification des variables GET, filtres
+    # Verification des variables GET, filtres
+
     if (isset($_GET['dragon'])){
         $checkDragon=$bd->prepare("SELECT * FROM especes WHERE id_espece=:id_espece;");
         if ($_GET['dragon']!='15'){
@@ -67,7 +68,33 @@
         $titre="<h2>Observations</h2>";}
 
     #Verification du formulaire
-    
+    if (isset($_POST['year_new_observation']) and isset($_POST['day_night_radio']) and 
+        isset($_POST['espece_select']) and isset($_POST['number_especes']) and isset($_POST['saison_select']) ) {
+
+            $year_value=(int)($_POST['year_new_observation']);
+            $number_especes=(int)($_POST['number_especes']);
+            $saison_select=(int)($_POST['saison_select']);
+            $espece_select=(int)($_POST['espece_select']);
+            $day_night=(int)($_POST['day_night_radio']);
+
+            if (isset($_POST['commentaire'])){
+                $commentaire=strip_tags($_POST['commentaire']);
+                $commentaire=trim($_POST['commentaire']);
+            }else {$commentaire='';}
+
+            if ( ($year_value) and ($number_especes) and ($espece_select) and ($saison_select) and ($day_night)) {
+                $insertObservation=$bd->prepare("INSERT INTO observations (id_espece, nombre, annee, saison, nuit, commentaire) VALUES (:espece_select, :number_especes, :year_value, :saison_select, :day_night, :commentaire)");
+                $insertObservation->bindvalue("espece_select", $espece_select);
+                $insertObservation->bindvalue("number_especes", $number_especes);
+                $insertObservation->bindvalue("year_value", $year_value);
+                $insertObservation->bindvalue("saison_select", $saison_select);
+                $insertObservation->bindvalue("day_night", $day_night);
+                $insertObservation->bindvalue("commentaire", $commentaire);
+                $insertObservation->execute();
+                header("Location:index.php?dragon=$espece_select");
+            }else {header("Location:index.php");}
+
+        }
 ?>
 
 
@@ -87,9 +114,9 @@
     </header>
     <div id="form_container">
 
-        <form action="index.php" id="insert_observation_form">
+        <form action="index.php" id="insert_observation_form" method="POST">
             <label for="year_new_observation">- Année : </label>
-            <input type="number" value="year_new_observation" min='0' id="year_new_observation" required>
+            <input type="number" name="year_new_observation" min='0' id="year_new_observation" required>
 
             <label for="saison_select">- Saison : </label>
             <select name="saison_select" id="saison_select" required>
