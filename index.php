@@ -1,8 +1,8 @@
 <?php 
     include "_connexionBD.php";
 
+    #Verification des variables GET, filtres
     if (isset($_GET['dragon'])){
-        
         $checkDragon=$bd->prepare("SELECT * FROM especes WHERE id_espece=:id_espece;");
         if ($_GET['dragon']!='15'){
             $checkDragon->bindvalue("id_espece", (int)$_GET['dragon']);
@@ -65,6 +65,9 @@
         $reqObservations=$bd->prepare("SELECT o.id_espece, e.espece, o.nombre, o.saison, o.annee, o.nuit, o.commentaire FROM observations as o JOIN especes AS e ON o.id_espece=e.id_espece WHERE o.id_espece!=15");
         $reqObservations->execute();
         $titre="<h2>Observations</h2>";}
+
+    #Verification du formulaire
+    
 ?>
 
 
@@ -82,13 +85,51 @@
         <p>Sur l'Île-aux-Dragons, Claytor-le-Sage scrute le ciel à la recherche de dragons et archive 
         scrupuleusement chaque observation dans une base de données MySQL via une interface PHP. </p>
     </header>
-    <div id="form_container"></div>
+    <div id="form_container">
+
+        <form action="index.php" id="insert_observation_form">
+            <label for="year_new_observation">- Année : </label>
+            <input type="number" value="year_new_observation" min='0' id="year_new_observation" required>
+
+            <label for="saison_select">- Saison : </label>
+            <select name="saison_select" id="saison_select" required>
+                <option value="1">Printemps</option>
+                <option value="2">Été</option>
+                <option value="3">Automne</option>
+                <option value="4">Hiver</option>
+            </select>
+            <p> - </p>
+            <input type="radio" name="day_night_radio" value="0">
+            <label for="day_radio">Jour</label>
+            <input type="radio" name="day_night_radio" value="1">
+            <label for="night_radio">Nuit</label>
+
+            <label for="espece_select">- Espèce : </label>
+            <select name="espece_select" id="espece_select" required>
+                <?php
+                    $reqEspeces=$bd->prepare("SELECT * FROM especes");
+                    $reqEspeces->execute();
+                    while($especes=$reqEspeces->fetch()){
+                        $id_especes=$especes['id_espece'];
+                        $espece_name=$especes['espece'];
+                        echo "<option value='$id_especes'>$espece_name</option>";}?>
+            </select>
+            
+            <label for="number_especes">- Nombre : </label>
+            <input type="number" name="number_especes" id="number_especes" min='0' required>
+            
+            <label for="commentaire">- Commentaire : </label>
+            <input type="text" name='commentaire' id="commentaire">
+
+            <input type="submit" value="Enregistrer observation">
+
+        </form>
+
+    </div>
     <a href="index.php" id="observations_link">Toutes les observations</a>
     <div id="observation_container">
         <?php
             echo $titre;
-            
-
             echo "<div id='dragons_container'>";
             while($observations=$reqObservations->fetch()){
                 $dragon_id=$observations['id_espece'];
