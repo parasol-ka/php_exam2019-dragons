@@ -22,7 +22,7 @@
         }else {header("Location:'index.php'");}
 
     }elseif (isset($_GET['year_observation'])){
-        $checkYear=$bd->prepare("SELECT * FROM observations WHERE annee=:year_observation;");
+        $checkYear=$bd->prepare("SELECT * FROM observations WHERE annee=:year_observation and id_espece!=15;");
         $checkYear->bindvalue("year_observation", (int)$_GET['year_observation']);
         $checkYear->execute();
         $year_checking=$checkYear->fetch();
@@ -31,13 +31,13 @@
             $year_checked=$_GET['year_observation'];
             $titre="<h2>Observations en $year_checked</h2>";
             
-            $reqObservations=$bd->prepare("SELECT o.id_espece, e.espece, o.nombre, o.saison, o.annee, o.nuit, o.commentaire FROM observations as o JOIN especes AS e ON o.id_espece=e.id_espece WHERE o.annee=:year_checked");
+            $reqObservations=$bd->prepare("SELECT o.id_espece, e.espece, o.nombre, o.saison, o.annee, o.nuit, o.commentaire FROM observations as o JOIN especes AS e ON o.id_espece=e.id_espece WHERE o.annee=:year_checked and o.id_espece!=15");
             $reqObservations->bindvalue("year_checked", $year_checked);
             $reqObservations->execute();
         }else {header("Location:'index.php'");}
 
     }elseif (isset($_GET['saison'])){
-        $checkSaison=$bd->prepare("SELECT * FROM observations WHERE saison=:saison_number;");
+        $checkSaison=$bd->prepare("SELECT * FROM observations WHERE saison=:saison_number and id_espece!=15;");
         $checkSaison->bindvalue("saison_number", (int)$_GET['saison']);
         $checkSaison->execute();
         $saison_checking=$checkSaison->fetch();
@@ -57,7 +57,7 @@
 
             $titre="<h2>Observations saison $saison_name</h2>";
             
-            $reqObservations=$bd->prepare("SELECT o.id_espece, e.espece, o.nombre, o.saison, o.annee, o.nuit, o.commentaire FROM observations as o JOIN especes AS e ON o.id_espece=e.id_espece WHERE o.saison=:saison_checked");
+            $reqObservations=$bd->prepare("SELECT o.id_espece, e.espece, o.nombre, o.saison, o.annee, o.nuit, o.commentaire FROM observations as o JOIN especes AS e ON o.id_espece=e.id_espece WHERE o.saison=:saison_checked and o.id_espece!=15");
             $reqObservations->bindvalue("saison_checked", $saison_checked);
             $reqObservations->execute();
         }else {header("Location:'index.php'");}
